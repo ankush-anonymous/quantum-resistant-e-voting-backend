@@ -6,22 +6,21 @@ const {
 } = require("../validators/voterValidator");
 const { StatusCodes } = require("http-status-codes");
 const axios = require("axios");
+const { log } = require("console");
 
 const createVoter = async (req, res, next) => {
   try {
     const validatedData = await validateCreateVoter(req.body);
-    console.log(req.body);
 
     // Get dilithium keys from Python server
     const keyResponse = await axios.get("http://0.0.0.0:8000/generate-keypair");
     const { public_key, private_key } = keyResponse.data;
-    console.log(validatedData);
+
     // Combine validated data with keys
     const voterData = {
       ...validatedData,
       dilithium_public_key: public_key,
       dilithium_private_key: private_key,
-      is_registered: false, // Set default registration status
     };
 
     const voter = await voterRepository.createVoter(voterData);
@@ -57,8 +56,8 @@ const getAllVoters = async (req, res, next) => {
 
 const getVoterById = async (req, res, next) => {
   try {
-    await validateGetVoterById(req.params.voterId);
-    const voter = await voterRepository.getVoterById(req.params.voterId);
+    await validateGetVoterById(req.params.id);
+    const voter = await voterRepository.getVoterById(req.params.id);
     if (!voter) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
@@ -76,10 +75,12 @@ const getVoterById = async (req, res, next) => {
 
 const updateVoter = async (req, res, next) => {
   try {
-    await validateGetVoterById(req.params.voterId);
+    await validateGetVoterById(req.params.id);
+
     const validatedData = await validateUpdateVoter(req.body);
+    console.log(validatedData);
     const voter = await voterRepository.updateVoter(
-      req.params.voterId,
+      req.params.id,
       validatedData
     );
     if (!voter) {

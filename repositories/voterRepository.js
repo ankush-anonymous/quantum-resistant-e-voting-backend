@@ -1,14 +1,17 @@
+const { log } = require("node:console");
 const { pool } = require("../db/connect");
 
 const voterRepository = {
   // Create a new voter
-  createVoter: async (name, email, dilithiumPublicKey, dilithiumPrivateKey) => {
+  createVoter: async (validatedData) => {
     try {
+      const { name, email, dilithium_public_key, dilithium_private_key } =
+        validatedData;
       const query = `
             INSERT INTO voters (voter_id, name, email, dilithium_public_key, dilithium_private_key, is_registered)
             VALUES (gen_random_uuid(), $1, $2, $3, $4, true)
             RETURNING *`;
-      const values = [name, email, dilithiumPublicKey, dilithiumPrivateKey];
+      const values = [name, email, dilithium_public_key, dilithium_private_key];
       const result = await pool.query(query, values);
       return result.rows[0];
     } catch (error) {
@@ -28,7 +31,7 @@ const voterRepository = {
   },
 
   // Get voter by ID
-  getVoter: async (voterId) => {
+  getVoterById: async (voterId) => {
     try {
       const query = "SELECT * FROM voters WHERE voter_id = $1";
       const values = [voterId];
@@ -39,24 +42,23 @@ const voterRepository = {
     }
   },
 
-  // Update voter
+  // Update voter (PATCH)
   updateVoter: async (voterId, updates) => {
     try {
-      const allowedUpdates = {
-        email: updates.email,
-        dilithium_public_key: updates.dilithiumPublicKey,
-        is_registered: updates.isRegistered,
-        is_voted: updates.isVoted,
-      };
-
-      // Filter out undefined values
-      const validUpdates = Object.entries(allowedUpdates)
-        .filter(([_, value]) => value !== undefined)
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+      // Only include fields that are actually present in the updates object
+      const validUpdates = {};
+      if (updates.email !== undefined) validUpdates.email = updates.email;
+      if (updates.dilithium_public_key !== undefined)
+        validUpdates.dilithium_public_key = updates.dilithium_public_key;
+      if (updates.isRegistered !== undefined)
+        validUpdates.is_registered = updates.isRegistered;
+      if (updates.isVoted !== undefined)
+        validUpdates.is_voted = updates.isVoted;
 
       if (Object.keys(validUpdates).length === 0) {
         return null;
       }
+      console.log(validUpdates);
 
       const setClauses = Object.keys(validUpdates)
         .map((key, index) => `${key} = $${index + 2}`)
