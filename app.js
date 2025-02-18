@@ -10,12 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// const userRoutes = require("./routes/user-routes");
-
+const voterRoutes = require("./routes/voterRouter");
 
 // Routes
-// app.use("/api/v1/users", userRoutes);
-
+app.use("/api/v1/voters", voterRoutes);
 
 // Connect to database and start server
 const startServer = async () => {
