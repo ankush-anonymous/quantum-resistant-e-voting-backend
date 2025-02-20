@@ -116,10 +116,61 @@ const deleteVoter = async (req, res, next) => {
   }
 };
 
+const verifyVoterSignature = async (req, res, next) => {
+  try {
+    const { voter_id, public_key, private_key } = req.body;
+
+    console.log("Sending request to FastAPI:", {
+      voter_id: voter_id,
+      public_key: public_key,
+      private_key: private_key,
+    });
+
+    // Make request to verification service
+    const verificationResponse = await axios.post(
+      "http://0.0.0.0:8000/authenticate-voter",
+      {
+        voter_id: voter_id,
+        public_key: public_key,
+        private_key: private_key,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    console.log(
+      "Verification Response:",
+      JSON.stringify(verificationResponse.data, null, 2)
+    );
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      data: verificationResponse.data,
+    });
+  } catch (error) {
+    if (error.response) {
+      console.error("FastAPI Response Error:", error.response.data);
+    } else {
+      console.error("Error:", error.message);
+    }
+
+    if (error.isAxiosError) {
+      return next({
+        status: StatusCodes.SERVICE_UNAVAILABLE,
+        message: "Failed to verify signature with verification service",
+        error: error.message,
+      });
+    }
+    next(error);
+  }
+};
+
 module.exports = {
   createVoter,
   getAllVoters,
   getVoterById,
   updateVoter,
   deleteVoter,
+  verifyVoterSignature,
 };

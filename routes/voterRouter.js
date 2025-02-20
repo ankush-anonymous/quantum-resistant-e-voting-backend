@@ -17,4 +17,7 @@ router.patch("/updateVoter/:id", voterController.updateVoter);
 // Delete voter
 router.delete("/deleteVoter/:id", voterController.deleteVoter);
 
+// Verify voter signature
+router.post("/verifySignature", voterController.verifyVoterSignature);
+
 module.exports = router;

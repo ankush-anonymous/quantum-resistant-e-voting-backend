@@ -58,7 +58,6 @@ const voterRepository = {
       if (Object.keys(validUpdates).length === 0) {
         return null;
       }
-      console.log(validUpdates);
 
       const setClauses = Object.keys(validUpdates)
         .map((key, index) => `${key} = $${index + 2}`)
