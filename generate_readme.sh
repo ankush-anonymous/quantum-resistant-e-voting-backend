@@ -1,3 +1,10 @@
+#!/bin/bash
+
+# Define the README file name
+README_FILE="README.md"
+
+# Write content to README.md
+cat <<EOF > $README_FILE
 # 🚀 Node.js Server with Docker
 
 This project runs a **Node.js server** inside a Docker container. Follow the steps below to get the server running locally.
@@ -8,15 +15,15 @@ This project runs a **Node.js server** inside a Docker container. Follow the ste
 
 First, clone this GitHub repository:
 
-```sh
+\`\`\`sh
 git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME.git
-```
+\`\`\`
 
 Move into the project directory:
 
-```sh
+\`\`\`sh
 cd YOUR_REPOSITORY_NAME
-```
+\`\`\`
 
 ---
 
@@ -34,9 +41,9 @@ If you're on **Windows**, you need to install **Docker Desktop**:
 
 Once Docker is installed and running, build the Docker image using the following command:
 
-```sh
+\`\`\`sh
 docker build -t my-node-server .
-```
+\`\`\`
 
 ---
 
@@ -44,9 +51,9 @@ docker build -t my-node-server .
 
 After building the image, start your Node.js server:
 
-```sh
+\`\`\`sh
 docker run -p 3000:3000 my-node-server
-```
+\`\`\`
 
 - This command maps port **3000** inside the container to port **3000** on your local machine.
 
@@ -56,15 +63,15 @@ docker run -p 3000:3000 my-node-server
 
 Once the container is running, open your browser and navigate to:
 
-```
+\`\`\`
 http://localhost:3000/
-```
+\`\`\`
 
 Or use **curl** to test the server:
 
-```sh
+\`\`\`sh
 curl http://localhost:3000/
-```
+\`\`\`
 
 ---
 
@@ -72,16 +79,16 @@ curl http://localhost:3000/
 
 To stop the running container:
 
-```sh
+\`\`\`sh
 docker ps  # Get the container ID
 docker stop CONTAINER_ID
-```
+\`\`\`
 
 To remove the container:
 
-```sh
+\`\`\`sh
 docker rm CONTAINER_ID
-```
+\`\`\`
 
 ---
 
@@ -89,9 +96,9 @@ docker rm CONTAINER_ID
 
 To remove the Docker image:
 
-```sh
+\`\`\`sh
 docker rmi my-node-server
-```
+\`\`\`
 
 ---
 
@@ -99,9 +106,9 @@ docker rmi my-node-server
 
 To check if your container is running:
 
-```sh
+\`\`\`sh
 docker ps
-```
+\`\`\`
 
 ---
 
@@ -115,3 +122,7 @@ This project is licensed under the **MIT License**.
 
 - **Your Name** - [GitHub](https://github.com/YOUR_GITHUB_USERNAME)
 
+EOF
+
+# Print success message
+echo "✅ README.md file has been successfully created!"
