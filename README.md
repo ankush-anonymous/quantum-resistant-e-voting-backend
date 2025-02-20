@@ -105,13 +105,7 @@ docker ps
 
 ---
 
-## 📜 License
-
-This project is licensed under the **MIT License**.
-
----
-
 ## 👨‍💻 Author
 
-- **Your Name** - [GitHub](https://github.com/YOUR_GITHUB_USERNAME)
+- **Ankush Choudhary** - [GitHub](https://github.com/ankush-anonymous)
 
