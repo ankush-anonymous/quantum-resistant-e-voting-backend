@@ -7,16 +7,17 @@ const {
 const { StatusCodes } = require("http-status-codes");
 const axios = require("axios");
 const { log } = require("console");
+const { generateKeyPair, authenticateVoter } = require("../utils/utils");
 
 const createVoter = async (req, res, next) => {
   try {
     const validatedData = await validateCreateVoter(req.body);
 
-    // Get dilithium keys from Python server
-    const keyResponse = await axios.get("http://0.0.0.0:8000/generate-keypair");
-    const { public_key, private_key } = keyResponse.data;
+    // Use the utility function to generate the keypair
+    const keyPairData = await generateKeyPair();
+    const { public_key, private_key } = keyPairData;
 
-    // Combine validated data with keys
+    // Combine the validated data with keys
     const voterData = {
       ...validatedData,
       dilithium_public_key: public_key,
@@ -30,7 +31,6 @@ const createVoter = async (req, res, next) => {
       data: voter,
     });
   } catch (error) {
-    // Handle specific axios errors
     if (error.isAxiosError) {
       return next({
         status: StatusCodes.SERVICE_UNAVAILABLE,
@@ -120,33 +120,16 @@ const verifyVoterSignature = async (req, res, next) => {
   try {
     const { voter_id, public_key, private_key } = req.body;
 
-    console.log("Sending request to FastAPI:", {
-      voter_id: voter_id,
-      public_key: public_key,
-      private_key: private_key,
-    });
+    console.log("Sending request to FastAPI:", { voter_id, public_key, private_key });
 
-    // Make request to verification service
-    const verificationResponse = await axios.post(
-      "http://0.0.0.0:8000/authenticate-voter",
-      {
-        voter_id: voter_id,
-        public_key: public_key,
-        private_key: private_key,
-      },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    // Use the utility function to authenticate the voter
+    const verificationData = await authenticateVoter(voter_id, public_key, private_key);
 
-    console.log(
-      "Verification Response:",
-      JSON.stringify(verificationResponse.data, null, 2)
-    );
+    console.log("Verification Response:", JSON.stringify(verificationData, null, 2));
 
     res.status(StatusCodes.OK).json({
       success: true,
-      data: verificationResponse.data,
+      data: verificationData,
     });
   } catch (error) {
     if (error.response) {
@@ -154,7 +137,6 @@ const verifyVoterSignature = async (req, res, next) => {
     } else {
       console.error("Error:", error.message);
     }
-
     if (error.isAxiosError) {
       return next({
         status: StatusCodes.SERVICE_UNAVAILABLE,
