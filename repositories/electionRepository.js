@@ -5,12 +5,12 @@ const electionRepository = {
   // Create a new election
   createElection: async (validatedData) => {
     try {
-      const { title, openfhe_public_key, openfhe_private_key } = validatedData;
+      const {election_id, title, openfhe_public_key, openfhe_private_key } = validatedData;
       const query = `
         INSERT INTO elections (election_id, title, fhe_public_key, fhe_private_key, created_at)
-        VALUES (gen_random_uuid(), $1, $2, $3, NOW())
+        VALUES ( $1, $2, $3,$4, NOW())
         RETURNING *`;
-      const values = [title, openfhe_public_key, openfhe_private_key];
+      const values = [election_id,title, openfhe_public_key, openfhe_private_key];
       const result = await pool.query(query, values);
       return result.rows[0];
     } catch (error) {

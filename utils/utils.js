@@ -28,9 +28,15 @@ const authenticateVoter = async (voter_id, voter_dilithium_public_key, voter_dil
   }
 };
 
-const generateFheKeypair = async() =>{
+const generateFheKeypair = async(election_id) =>{
   try {
-    const response = await axios.get(`${PYTHON_URL}/openfhe-keygen`);
+    console.log(typeof election_id);
+    const response = await axios.post(
+      `${PYTHON_URL}/openfhe-keygen`,
+      {
+        election_id,
+      },
+      { headers: { "Content-Type": "application/json" } });
     return response.data;
   } catch (error) {
     throw new Error("Failed to generate OpenFHE keypair: " + error.message);

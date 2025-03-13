@@ -1,3 +1,5 @@
+const { log } = require("node:console");
+const { pool } = require("../db/connect");
 const voteRepository = {
     // Create a new vote
     createVote: async (validatedData) => {
@@ -47,4 +49,6 @@ const voteRepository = {
       }
     },
   };
-  
+
+  module.exports = voteRepository;
+       
