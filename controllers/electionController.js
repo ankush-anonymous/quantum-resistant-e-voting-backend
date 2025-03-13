@@ -1,20 +1,28 @@
 const { StatusCodes } = require("http-status-codes");
 const electionRepository = require("../repositories/electionRepository");
+const { generateFheKeypair } = require("../utils/utils");
 
 const electionController = {
   // Create new election
   createElection: async (req, res) => {
     try {
-      const election = await electionRepository.createElection(req.body);
+      const { title } = req.body;
+      // Assuming generateFheKeypair returns an object with both keys
+      const { openfhe_public_key, openfhe_private_key } = await generateFheKeypair();
+      const validatedData = { title, openfhe_public_key, openfhe_private_key };
+  
+      const election = await electionRepository.createElection(validatedData);
       res
         .status(StatusCodes.CREATED)
-        .json({ message: "Election created successfully", election });
+        .json({ message: "Keys Generated. Election created successfully", election });
     } catch (error) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message: `Controller: Failed to create election - ${error.message}`,
       });
     }
   },
+  
+  
 
   // Get all elections
   getAllElections: async (req, res) => {
@@ -50,9 +58,9 @@ const electionController = {
   },
 
   // Update election
-  updateElection: async (req, res) => {
+  updateElection: async (req, res) => { 
     try {
-      const updatedElection = await electionRepository.updateElection(
+      const updatedElection = await electionRepository.updateElection( 
         req.params.id,
         req.body
       );

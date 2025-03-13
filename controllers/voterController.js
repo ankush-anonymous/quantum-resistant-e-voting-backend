@@ -78,7 +78,7 @@ const updateVoter = async (req, res, next) => {
     await validateGetVoterById(req.params.id);
 
     const validatedData = await validateUpdateVoter(req.body);
-    console.log(validatedData);
+    
     const voter = await voterRepository.updateVoter(
       req.params.id,
       validatedData
@@ -118,15 +118,12 @@ const deleteVoter = async (req, res, next) => {
 
 const verifyVoterSignature = async (req, res, next) => {
   try {
-    const { voter_id, public_key, private_key } = req.body;
+    const { voter_id, voter_dilithium_public_key, voter_dilithium_private_key } = req.body;
 
-    console.log("Sending request to FastAPI:", { voter_id, public_key, private_key });
+    console.log("Sending request to FastAPI to verify signature:");
 
     // Use the utility function to authenticate the voter
-    const verificationData = await authenticateVoter(voter_id, public_key, private_key);
-
-    console.log("Verification Response:", JSON.stringify(verificationData, null, 2));
-
+    const verificationData = await authenticateVoter(voter_id, voter_dilithium_public_key, voter_dilithium_private_key);
     res.status(StatusCodes.OK).json({
       success: true,
       data: verificationData,

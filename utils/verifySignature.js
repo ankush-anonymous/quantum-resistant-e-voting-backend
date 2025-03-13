@@ -3,7 +3,6 @@ const { log } = require("console");
 
 const verifyVoterSignatureUtil = async (voterId, publicKey, privateKey) => {
   try {
-    // console.log(voterId);
     const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
 
     const response = await axios.get(`${API_BASE_URL}/authenticate-voter`, {
