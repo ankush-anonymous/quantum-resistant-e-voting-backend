@@ -3,7 +3,8 @@ const PYTHON_URL = process.env.PYTHON_URL
 
 const generateKeyPair = async () => {
   try {
-    const response = await axios.get(`${PYTHON_URL}/generate-keypair`);
+    const response = await axios.get(`${PYTHON_URL}/generate-voter-dilithium-keypair`);
+    
     return response.data; // e.g., { public_key: "…", private_key: "…" }
   } catch (error) {
     throw new Error("Failed to generate keypair: " + error.message);
@@ -42,9 +43,24 @@ const generateFheKeypair = async(election_id) =>{
     throw new Error("Failed to generate OpenFHE keypair: " + error.message);
   }
 }
+const sendCandidateMapping = async(election_id,mapping) =>{
+  try {
+    const response = await axios.post(
+      `${PYTHON_URL}/store-candidate-mapping`,
+      {
+        election_id,
+        mapping
+      },
+      { headers: { "Content-Type": "application/json" } });
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to generate OpenFHE keypair: " + error.message);
+  }
+}
 
 module.exports = {
   generateKeyPair,
   authenticateVoter,
-  generateFheKeypair
+  generateFheKeypair,
+  sendCandidateMapping
 };

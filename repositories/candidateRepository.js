@@ -7,16 +7,14 @@ const candidateRepository = {
       const query = `
         INSERT INTO candidates (
           candidate_id,
-          election_id,
           name,
           party,
           description
         )
-        VALUES (gen_random_uuid(), $1, $2, $3, $4)
+        VALUES (gen_random_uuid(), $1, $2, $3)
         RETURNING *`;
 
       const values = [
-        candidateData.electionId,
         candidateData.name,
         candidateData.party,
         candidateData.description,

@@ -48,6 +48,19 @@ const voteRepository = {
         throw new Error(`Error creating vote: ${error.message}`);
       }
     },
+
+
+    getAllEncryptedVotes: async()=>{
+      try {
+        const query = 'SELECT encrypted_vote from votes';
+        const result = await pool.query(query);
+        return result.rows;
+      } catch (error) {
+        throw new Error(`Repository: Error querying encrypted vote: ${error.message}`);
+
+        
+      }
+    }
   };
 
   module.exports = voteRepository;

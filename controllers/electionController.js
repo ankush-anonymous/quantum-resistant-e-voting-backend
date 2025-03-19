@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const electionRepository = require("../repositories/electionRepository");
-const { generateFheKeypair } = require("../utils/utils");
+const { generateFheKeypair,sendCandidateMapping } = require("../utils/utils");
 const crypto = require("crypto");
 
 
@@ -19,36 +19,53 @@ function generateElectionId(title) {
 
 const electionController = {
   // Create new election
-  createElection: async (req, res) => {
+ createElection : async (req, res) => {
     try {
-      const { title } = req.body;
-      // Generate a unique election id that is a mix of the title and a random component
-      const electionId = generateElectionId(title);
-      console.log(electionId);
       
-      // Pass the election id to the Python key-generation function
+      const { title, candidates } = req.body; // Candidates array from request
+      if (!title || !Array.isArray(candidates) || candidates.length === 0) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            message: "Invalid request: title and candidates array are required."
+        });
+    }
+      const electionId = generateElectionId(title);
+        
+      // Generate candidate mapping (Indexing starts from 0)
+      const candidateMapping = {};
+      candidates.forEach((candidate, index) => {
+        candidateMapping[candidate] = index;
+      });
+  
+      // Send mapping to Python Server for JSON storage
+      const candidateMappingResponse = await sendCandidateMapping(electionId,candidateMapping)
+  
+      // Generate FHE Keys
       const { openfhe_public_key, openfhe_private_key } = await generateFheKeypair(electionId);
-
-      // Build the validated data with the generated election id and keys
+  
+      // Build validated data with candidate mapping
       const validatedData = { 
         election_id: electionId, 
         title, 
-        openfhe_public_key, 
-        openfhe_private_key 
+        openfhe_public_key,  
+        openfhe_private_key,
+        candidate_mapping: JSON.stringify(candidateMapping) // Convert to JSON for DB storage
       };
-
-      // Save the election record using the repository
+  
+      // Save election in DB
       const election = await electionRepository.createElection(validatedData);
+      
       res.status(StatusCodes.CREATED).json({
-        message: "Keys generated. Election created successfully",
+        message: "Election created successfully with candidate mapping",
         election
       });
+  
     } catch (error) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message: `Controller: Failed to create election - ${error.message}`,
       });
     }
   },
+  
   
   
 

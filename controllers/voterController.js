@@ -15,13 +15,17 @@ const createVoter = async (req, res, next) => {
 
     // Use the utility function to generate the keypair
     const keyPairData = await generateKeyPair();
-    const { public_key, private_key } = keyPairData;
+    
+    const { voter_dilithium_public_key, voter_dilithium_private_key } = keyPairData;
+    if (!voter_dilithium_public_key || !voter_dilithium_private_key) {
+      throw new Error("Failed to generate Dilithium key pair - received null values");
+    }
 
     // Combine the validated data with keys
     const voterData = {
       ...validatedData,
-      dilithium_public_key: public_key,
-      dilithium_private_key: private_key,
+      dilithium_public_key: voter_dilithium_public_key,
+      dilithium_private_key: voter_dilithium_private_key,
     };
 
     const voter = await voterRepository.createVoter(voterData);

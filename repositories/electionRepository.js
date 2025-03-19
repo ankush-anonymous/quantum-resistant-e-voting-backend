@@ -5,18 +5,19 @@ const electionRepository = {
   // Create a new election
   createElection: async (validatedData) => {
     try {
-      const {election_id, title, openfhe_public_key, openfhe_private_key } = validatedData;
+      const {election_id, title, openfhe_public_key, openfhe_private_key, candidate_mapping } = validatedData;
       const query = `
-        INSERT INTO elections (election_id, title, fhe_public_key, fhe_private_key, created_at)
-        VALUES ( $1, $2, $3,$4, NOW())
+        INSERT INTO elections (election_id, title, fhe_public_key, fhe_private_key, candidate_mapping, created_at)
+        VALUES ($1, $2, $3, $4, $5, NOW())
         RETURNING *`;
-      const values = [election_id,title, openfhe_public_key, openfhe_private_key];
+      const values = [election_id, title, openfhe_public_key, openfhe_private_key, candidate_mapping];
       const result = await pool.query(query, values);
       return result.rows[0];
     } catch (error) {
       throw new Error(`Error creating election: ${error.message}`);
     }
   },
+
 
   // Get all elections
   getAllElections: async () => {
