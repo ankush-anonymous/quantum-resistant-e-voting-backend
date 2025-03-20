@@ -55,14 +55,16 @@ const voteController = {
     try {
       // Step 1: Retrieve all encrypted votes from the database.
       const votes = await voteRepository.getAllEncryptedVotes();
-      console.log("Exporting votes:");
+      console.log("Exporting votes...:");
 
       // Step 2: Send the votes JSON to the Python server.
       // Replace 'http://python-server-address:port/receive-votes' with the actual URL of your Python server.
       const response = await axios.post(
         `${PYTHON_SERVER_URL}/receive-votes`,
-        { votes: votes }
+        { votes: votes },
+        { headers: { "Content-Type": "application/json" } }
       );
+      
       console.log("Response from Python server:", response.data);
  
       // Step 3: Return a success response.
